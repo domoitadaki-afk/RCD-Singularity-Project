@@ -152,70 +152,77 @@ def update_score():
 # ==========================================
 # GUI SETUP
 # ==========================================
-root = tk.Tk()
-root.title("Stirrup Spacing & 4-Rule Max (Section 425.2.1)")
-root.geometry("720x650")
-root.resizable(False, False)
 
-root.bind('<Return>', check_answers)
+def main():
+    global b, cc, nb, db, dagg, has_stirrups, dv, corr_rebar_S, corr_agg_S, corr_final_S, score_rebar, score_agg, score_final, score_total, root, frame_props, label_b, label_cc, label_nb, label_db, label_dagg, label_stirrup, frame_in, entry_rebar_S, entry_agg_S, entry_final_S, frame_btns, btn_check, btn_hint, result_lbl, score_lbl
+    root = tk.Tk()
+    root.title("Stirrup Spacing & 4-Rule Max (Section 425.2.1)")
+    root.geometry("720x650")
+    root.resizable(False, False)
 
-# 1. Header
-tk.Label(root, text="Stirrup Spacing & Final Spacing Practice", font=("Arial", 14, "bold")).pack(pady=10)
+    root.bind('<Return>', check_answers)
 
-# 2. Generate Button
-tk.Button(root, text="🔄 Generate New Problem", command=generate_problem, bg="#ececec", font=("Arial", 10)).pack(pady=5)
+    # 1. Header
+    tk.Label(root, text="Stirrup Spacing & Final Spacing Practice", font=("Arial", 14, "bold")).pack(pady=10)
 
-# 3. Beam Properties Box
-frame_props = tk.LabelFrame(root, text="Beam Properties & Conditions", padx=10, pady=10)
-frame_props.pack(pady=10)
+    # 2. Generate Button
+    tk.Button(root, text="🔄 Generate New Problem", command=generate_problem, bg="#ececec", font=("Arial", 10)).pack(pady=5)
 
-label_b = tk.Label(frame_props, text="Beam Width (b): - mm", font=("Arial", 10))
-label_b.pack()
-label_cc = tk.Label(frame_props, text="Concrete Cover (cc): - mm", font=("Arial", 10))
-label_cc.pack()
-label_nb = tk.Label(frame_props, text="Number of Rebars (nb): -", font=("Arial", 10))
-label_nb.pack()
-label_db = tk.Label(frame_props, text="Rebar Diameter (db): - mm", font=("Arial", 10))
-label_db.pack()
-label_dagg = tk.Label(frame_props, text="Max Aggregate Size (dagg): - mm", font=("Arial", 10))
-label_dagg.pack()
-label_stirrup = tk.Label(frame_props, text="Stirrups Present? -", font=("Arial", 10, "bold"))
-label_stirrup.pack(pady=(5, 0))
+    # 3. Beam Properties Box
+    frame_props = tk.LabelFrame(root, text="Beam Properties & Conditions", padx=10, pady=10)
+    frame_props.pack(pady=10)
 
-# 4. User Input Fields
-frame_in = tk.LabelFrame(root, text="Your Answers", padx=10, pady=10)
-frame_in.pack(pady=15)
+    label_b = tk.Label(frame_props, text="Beam Width (b): - mm", font=("Arial", 10))
+    label_b.pack()
+    label_cc = tk.Label(frame_props, text="Concrete Cover (cc): - mm", font=("Arial", 10))
+    label_cc.pack()
+    label_nb = tk.Label(frame_props, text="Number of Rebars (nb): -", font=("Arial", 10))
+    label_nb.pack()
+    label_db = tk.Label(frame_props, text="Rebar Diameter (db): - mm", font=("Arial", 10))
+    label_db.pack()
+    label_dagg = tk.Label(frame_props, text="Max Aggregate Size (dagg): - mm", font=("Arial", 10))
+    label_dagg.pack()
+    label_stirrup = tk.Label(frame_props, text="Stirrups Present? -", font=("Arial", 10, "bold"))
+    label_stirrup.pack(pady=(5, 0))
 
-tk.Label(frame_in, text="Rule 4: Rebar Spacing (mm):").grid(row=0, column=0, pady=5, sticky="e")
-entry_rebar_S = tk.Entry(frame_in, width=15)
-entry_rebar_S.grid(row=0, column=1, pady=5, padx=5)
+    # 4. User Input Fields
+    frame_in = tk.LabelFrame(root, text="Your Answers", padx=10, pady=10)
+    frame_in.pack(pady=15)
 
-tk.Label(frame_in, text="Rule 3: Aggregate Spacing (mm):").grid(row=1, column=0, pady=5, sticky="e")
-entry_agg_S = tk.Entry(frame_in, width=15)
-entry_agg_S.grid(row=1, column=1, pady=5, padx=5)
+    tk.Label(frame_in, text="Rule 4: Rebar Spacing (mm):").grid(row=0, column=0, pady=5, sticky="e")
+    entry_rebar_S = tk.Entry(frame_in, width=15)
+    entry_rebar_S.grid(row=0, column=1, pady=5, padx=5)
 
-tk.Label(frame_in, text="Final Clear Spacing (mm):").grid(row=2, column=0, pady=5, sticky="e")
-entry_final_S = tk.Entry(frame_in, width=15)
-entry_final_S.grid(row=2, column=1, pady=5, padx=5)
+    tk.Label(frame_in, text="Rule 3: Aggregate Spacing (mm):").grid(row=1, column=0, pady=5, sticky="e")
+    entry_agg_S = tk.Entry(frame_in, width=15)
+    entry_agg_S.grid(row=1, column=1, pady=5, padx=5)
 
-# 5. Action Buttons
-frame_btns = tk.Frame(root)
-frame_btns.pack(pady=10)
+    tk.Label(frame_in, text="Final Clear Spacing (mm):").grid(row=2, column=0, pady=5, sticky="e")
+    entry_final_S = tk.Entry(frame_in, width=15)
+    entry_final_S.grid(row=2, column=1, pady=5, padx=5)
 
-btn_check = tk.Button(frame_btns, text="✅ Check My Answers", command=check_answers, bg="#b3d9ff", font=("Arial", 10))
-btn_check.pack(side="left", padx=5)
+    # 5. Action Buttons
+    frame_btns = tk.Frame(root)
+    frame_btns.pack(pady=10)
 
-btn_hint = tk.Button(frame_btns, text="💡 4-Rule Step-by-Step", command=show_hint, bg="#fff3cd", font=("Arial", 10))
-btn_hint.pack(side="left", padx=5)
+    btn_check = tk.Button(frame_btns, text="✅ Check My Answers", command=check_answers, bg="#b3d9ff", font=("Arial", 10))
+    btn_check.pack(side="left", padx=5)
 
-# 6. Results and Score
-result_lbl = tk.Label(root, text="", font=("Arial", 10))
-result_lbl.pack(pady=5)
+    btn_hint = tk.Button(frame_btns, text="💡 4-Rule Step-by-Step", command=show_hint, bg="#fff3cd", font=("Arial", 10))
+    btn_hint.pack(side="left", padx=5)
 
-score_lbl = tk.Label(root, text="Score: 0 / 0", font=("Arial", 10, "bold"))
-score_lbl.pack(pady=5)
+    # 6. Results and Score
+    result_lbl = tk.Label(root, text="", font=("Arial", 10))
+    result_lbl.pack(pady=5)
 
-# Initial Generation
-generate_problem()
+    score_lbl = tk.Label(root, text="Score: 0 / 0", font=("Arial", 10, "bold"))
+    score_lbl.pack(pady=5)
 
-root.mainloop()
+    # Initial Generation
+    generate_problem()
+
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()

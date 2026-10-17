@@ -11,7 +11,8 @@ are then computed for whichever bar you chose.
 """
 
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import messagebox
+from tkinter import ttk
 import math
 import random
 

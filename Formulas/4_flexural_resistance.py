@@ -133,68 +133,75 @@ def update_score():
 # ==========================================
 # GUI SETUP
 # ==========================================
-root = tk.Tk()
-root.title("Flexural Resistance & Rho Solver")
-root.geometry("650x550")
-root.resizable(False, False)
 
-# Bind the Enter key to check answers
-root.bind('<Return>', check_rho)
+def main():
+    global current_b, current_d, current_fc, current_fy, current_phi, current_Mu, correct_R, correct_rho, score_R, score_rho, score_total, root, frame_props, label_b, label_d, label_fc, label_fy, label_phi, label_mu, frame_in, entry_R, entry_rho, frame_btns, btn_check, btn_hint, result_lbl, score_lbl
+    root = tk.Tk()
+    root.title("Flexural Resistance & Rho Solver")
+    root.geometry("650x550")
+    root.resizable(False, False)
 
-# 1. Header
-tk.Label(root, text="Flexural Resistance (R) & Rho Solver", font=("Arial", 14, "bold")).pack(pady=10)
+    # Bind the Enter key to check answers
+    root.bind('<Return>', check_rho)
 
-# 2. Generate Button
-tk.Button(root, text="🔄 Generate Random Beam", command=generate_rho_problem, bg="#ececec", font=("Arial", 10)).pack(pady=10)
+    # 1. Header
+    tk.Label(root, text="Flexural Resistance (R) & Rho Solver", font=("Arial", 14, "bold")).pack(pady=10)
 
-# 3. Beam Properties Box
-frame_props = tk.LabelFrame(root, text="Beam Properties", padx=10, pady=10)
-frame_props.pack(pady=10)
+    # 2. Generate Button
+    tk.Button(root, text="🔄 Generate Random Beam", command=generate_rho_problem, bg="#ececec", font=("Arial", 10)).pack(pady=10)
 
-label_b = tk.Label(frame_props, text="Width (b) = - mm", font=("Arial", 10))
-label_b.pack()
-label_d = tk.Label(frame_props, text="Eff. Depth (d) = - mm", font=("Arial", 10))
-label_d.pack()
-label_fc = tk.Label(frame_props, text="Concrete (f'c) = - MPa", font=("Arial", 10))
-label_fc.pack()
-label_fy = tk.Label(frame_props, text="Steel (fy) = - MPa", font=("Arial", 10))
-label_fy.pack()
-label_phi = tk.Label(frame_props, text="Strength Factor (φ) = -", font=("Arial", 10))
-label_phi.pack()
-label_mu = tk.Label(frame_props, text="Moment (Mu) = - kN-m", font=("Arial", 10, "bold"))
-label_mu.pack(pady=(5,0))
+    # 3. Beam Properties Box
+    frame_props = tk.LabelFrame(root, text="Beam Properties", padx=10, pady=10)
+    frame_props.pack(pady=10)
 
-# 4. User Input Fields
-frame_in = tk.LabelFrame(root, text="Your Calculations", padx=10, pady=10)
-frame_in.pack(pady=15)
+    label_b = tk.Label(frame_props, text="Width (b) = - mm", font=("Arial", 10))
+    label_b.pack()
+    label_d = tk.Label(frame_props, text="Eff. Depth (d) = - mm", font=("Arial", 10))
+    label_d.pack()
+    label_fc = tk.Label(frame_props, text="Concrete (f'c) = - MPa", font=("Arial", 10))
+    label_fc.pack()
+    label_fy = tk.Label(frame_props, text="Steel (fy) = - MPa", font=("Arial", 10))
+    label_fy.pack()
+    label_phi = tk.Label(frame_props, text="Strength Factor (φ) = -", font=("Arial", 10))
+    label_phi.pack()
+    label_mu = tk.Label(frame_props, text="Moment (Mu) = - kN-m", font=("Arial", 10, "bold"))
+    label_mu.pack(pady=(5,0))
 
-tk.Label(frame_in, text="Resistance Factor (R):").grid(row=0, column=0, pady=5, sticky="e")
-entry_R = tk.Entry(frame_in, width=15)
-entry_R.grid(row=0, column=1, pady=5, padx=5)
+    # 4. User Input Fields
+    frame_in = tk.LabelFrame(root, text="Your Calculations", padx=10, pady=10)
+    frame_in.pack(pady=15)
 
-tk.Label(frame_in, text="Actual Rho (ρ):").grid(row=1, column=0, pady=5, sticky="e")
-entry_rho = tk.Entry(frame_in, width=15)
-entry_rho.grid(row=1, column=1, pady=5, padx=5)
+    tk.Label(frame_in, text="Resistance Factor (R):").grid(row=0, column=0, pady=5, sticky="e")
+    entry_R = tk.Entry(frame_in, width=15)
+    entry_R.grid(row=0, column=1, pady=5, padx=5)
 
-# 5. Action Buttons
-frame_btns = tk.Frame(root)
-frame_btns.pack(pady=10)
+    tk.Label(frame_in, text="Actual Rho (ρ):").grid(row=1, column=0, pady=5, sticky="e")
+    entry_rho = tk.Entry(frame_in, width=15)
+    entry_rho.grid(row=1, column=1, pady=5, padx=5)
 
-btn_check = tk.Button(frame_btns, text="✅ Check My Answers", command=check_rho, bg="#b3d9ff", font=("Arial", 10))
-btn_check.pack(side="left", padx=5)
+    # 5. Action Buttons
+    frame_btns = tk.Frame(root)
+    frame_btns.pack(pady=10)
 
-btn_hint = tk.Button(frame_btns, text="💡 Show Hint", command=show_rho_hint, bg="#fff3cd", font=("Arial", 10))
-btn_hint.pack(side="left", padx=5)
+    btn_check = tk.Button(frame_btns, text="✅ Check My Answers", command=check_rho, bg="#b3d9ff", font=("Arial", 10))
+    btn_check.pack(side="left", padx=5)
 
-# 6. Results and Score
-result_lbl = tk.Label(root, text="", font=("Arial", 10))
-result_lbl.pack(pady=5)
+    btn_hint = tk.Button(frame_btns, text="💡 Show Hint", command=show_rho_hint, bg="#fff3cd", font=("Arial", 10))
+    btn_hint.pack(side="left", padx=5)
 
-score_lbl = tk.Label(root, text="Score: 0 / 0", font=("Arial", 10, "bold"))
-score_lbl.pack(pady=5)
+    # 6. Results and Score
+    result_lbl = tk.Label(root, text="", font=("Arial", 10))
+    result_lbl.pack(pady=5)
 
-# Initial Generation
-generate_rho_problem()
+    score_lbl = tk.Label(root, text="Score: 0 / 0", font=("Arial", 10, "bold"))
+    score_lbl.pack(pady=5)
 
-# Run the main loop
-root.mainloop()
+    # Initial Generation
+    generate_rho_problem()
+
+    # Run the main loop
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()
