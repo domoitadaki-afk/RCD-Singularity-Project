@@ -102,62 +102,69 @@ def update_score():
     score_label.config(text=f"Condition Score: {score_cond_correct}/{score_total}  |  Beta Score: {score_beta_correct}/{score_total}")
 
 # --- GUI Setup ---
-root = tk.Tk()
-root.title("Beta 1 (β₁) Determination Practice")
-root.geometry("580x480")
-root.resizable(False, False)
 
-root.bind('<Return>', lambda event: check_answer())
+def main():
+    global current_fc, correct_condition, correct_beta, score_cond_correct, score_beta_correct, score_total, root, btn_generate, frame_values, label_fc, frame_inputs, entry_condition, entry_beta, frame_buttons, btn_check, btn_hint, frame_results, result_label, answer_reveal_label, score_label
+    root = tk.Tk()
+    root.title("Beta 1 (β₁) Determination Practice")
+    root.geometry("580x480")
+    root.resizable(False, False)
 
-# 1. Header
-tk.Label(root, text="Beta 1 Calculation Practice (ACI 318)", font=("Arial", 14, "bold")).pack(pady=10)
+    root.bind('<Return>', lambda event: check_answer())
 
-# 2. Generate Button
-btn_generate = tk.Button(root, text="🔄 Generate New f'c", command=generate_problem, bg="#ececec", font=("Arial", 10, "bold"))
-btn_generate.pack(pady=10)
+    # 1. Header
+    tk.Label(root, text="Beta 1 Calculation Practice (ACI 318)", font=("Arial", 14, "bold")).pack(pady=10)
 
-# 3. Display Values
-frame_values = tk.Frame(root)
-frame_values.pack(pady=10)
-label_fc = tk.Label(frame_values, text="f'c = - MPa", font=("Arial", 12))
-label_fc.pack()
+    # 2. Generate Button
+    btn_generate = tk.Button(root, text="🔄 Generate New f'c", command=generate_problem, bg="#ececec", font=("Arial", 10, "bold"))
+    btn_generate.pack(pady=10)
 
-# 4. User Input Fields
-frame_inputs = tk.LabelFrame(root, text="Your Answers", padx=10, pady=10)
-frame_inputs.pack(pady=15)
+    # 3. Display Values
+    frame_values = tk.Frame(root)
+    frame_values.pack(pady=10)
+    label_fc = tk.Label(frame_values, text="f'c = - MPa", font=("Arial", 12))
+    label_fc.pack()
 
-tk.Label(frame_inputs, text="Condition/Range:").grid(row=0, column=0, pady=5, sticky="e")
-entry_condition = tk.Entry(frame_inputs, width=25)
-entry_condition.grid(row=0, column=1, pady=5, padx=5)
-tk.Label(frame_inputs, text="(e.g. x < fc' < y)", font=("Arial", 8), fg="gray").grid(row=0, column=2, pady=5, sticky="w")
+    # 4. User Input Fields
+    frame_inputs = tk.LabelFrame(root, text="Your Answers", padx=10, pady=10)
+    frame_inputs.pack(pady=15)
 
-tk.Label(frame_inputs, text="Beta 1 (β₁):").grid(row=1, column=0, pady=5, sticky="e")
-entry_beta = tk.Entry(frame_inputs, width=25)
-entry_beta.grid(row=1, column=1, pady=5, padx=5)
-tk.Label(frame_inputs, text="(Type the calculated decimal)", font=("Arial", 8), fg="gray").grid(row=1, column=2, pady=5, sticky="w")
+    tk.Label(frame_inputs, text="Condition/Range:").grid(row=0, column=0, pady=5, sticky="e")
+    entry_condition = tk.Entry(frame_inputs, width=25)
+    entry_condition.grid(row=0, column=1, pady=5, padx=5)
+    tk.Label(frame_inputs, text="(e.g. x < fc' < y)", font=("Arial", 8), fg="gray").grid(row=0, column=2, pady=5, sticky="w")
 
-# 5. Action Buttons
-frame_buttons = tk.Frame(root)
-frame_buttons.pack(pady=10)
+    tk.Label(frame_inputs, text="Beta 1 (β₁):").grid(row=1, column=0, pady=5, sticky="e")
+    entry_beta = tk.Entry(frame_inputs, width=25)
+    entry_beta.grid(row=1, column=1, pady=5, padx=5)
+    tk.Label(frame_inputs, text="(Type the calculated decimal)", font=("Arial", 8), fg="gray").grid(row=1, column=2, pady=5, sticky="w")
 
-btn_check = tk.Button(frame_buttons, text="✅ Show Answer / Check", command=check_answer, bg="#b3d9ff", font=("Arial", 10, "bold"))
-btn_check.pack(side="left", padx=5)
+    # 5. Action Buttons
+    frame_buttons = tk.Frame(root)
+    frame_buttons.pack(pady=10)
 
-btn_hint = tk.Button(frame_buttons, text="💡 Hint: Beta 1 Eq", command=show_hint, bg="#fff3cd", font=("Arial", 10, "bold"))
-btn_hint.pack(side="left", padx=5)
+    btn_check = tk.Button(frame_buttons, text="✅ Show Answer / Check", command=check_answer, bg="#b3d9ff", font=("Arial", 10, "bold"))
+    btn_check.pack(side="left", padx=5)
 
-# 6. Results & Score
-frame_results = tk.Frame(root)
-frame_results.pack(pady=10)
+    btn_hint = tk.Button(frame_buttons, text="💡 Hint: Beta 1 Eq", command=show_hint, bg="#fff3cd", font=("Arial", 10, "bold"))
+    btn_hint.pack(side="left", padx=5)
 
-result_label = tk.Label(frame_results, text="", font=("Arial", 11))
-result_label.pack()
+    # 6. Results & Score
+    frame_results = tk.Frame(root)
+    frame_results.pack(pady=10)
 
-answer_reveal_label = tk.Label(frame_results, text="", font=("Arial", 11, "bold"))
-answer_reveal_label.pack()
+    result_label = tk.Label(frame_results, text="", font=("Arial", 11))
+    result_label.pack()
 
-score_label = tk.Label(root, text="Condition Score: 0 / 0  |  Beta Score: 0 / 0", font=("Arial", 10, "bold"))
-score_label.pack(side="bottom", pady=10)
+    answer_reveal_label = tk.Label(frame_results, text="", font=("Arial", 11, "bold"))
+    answer_reveal_label.pack()
 
-generate_problem()
-root.mainloop()
+    score_label = tk.Label(root, text="Condition Score: 0 / 0  |  Beta Score: 0 / 0", font=("Arial", 10, "bold"))
+    score_label.pack(side="bottom", pady=10)
+
+    generate_problem()
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()

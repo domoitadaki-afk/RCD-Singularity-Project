@@ -134,73 +134,80 @@ def update_score():
         score_label.config(text=f"Base: {score_base}/{score_total} | Mod: {score_mod}/{score_total} | Final: {score_final}/{score_total}")
 
 # --- GUI Setup ---
-root = tk.Tk()
-root.title("Beam Minimum Depth Reviewer (ACI 318)")
-root.geometry("650x520")
-root.resizable(False, False)
 
-root.bind('<Return>', lambda event: check_answer())
+def main():
+    global current_support, current_span_mm, current_fy, correct_base_h, correct_modifier, correct_final_h, score_base, score_mod, score_final, score_total, root, btn_generate, frame_values, label_support, label_span, label_fy, frame_inputs, entry_base, entry_modifier, entry_final, frame_buttons, btn_check, btn_hint, frame_results, result_label, detail_feedback, score_label
+    root = tk.Tk()
+    root.title("Beam Minimum Depth Reviewer (ACI 318)")
+    root.geometry("650x520")
+    root.resizable(False, False)
 
-# 1. Header
-tk.Label(root, text="Non-Prestressed Beam Depth Reviewer", font=("Arial", 14, "bold")).pack(pady=10)
+    root.bind('<Return>', lambda event: check_answer())
 
-# 2. Generate Button
-btn_generate = tk.Button(root, text="🔄 Generate New Beam", command=generate_problem, bg="#ececec", font=("Arial", 10, "bold"))
-btn_generate.pack(pady=10)
+    # 1. Header
+    tk.Label(root, text="Non-Prestressed Beam Depth Reviewer", font=("Arial", 14, "bold")).pack(pady=10)
 
-# 3. Display Problem Values
-frame_values = tk.Frame(root)
-frame_values.pack(pady=10)
-label_support = tk.Label(frame_values, text="Support Condition: -", font=("Arial", 11))
-label_support.pack()
-label_span = tk.Label(frame_values, text="Span (ℓ): - mm", font=("Arial", 11))
-label_span.pack()
-label_fy = tk.Label(frame_values, text="Steel Yield (fy): - MPa", font=("Arial", 11))
-label_fy.pack()
+    # 2. Generate Button
+    btn_generate = tk.Button(root, text="🔄 Generate New Beam", command=generate_problem, bg="#ececec", font=("Arial", 10, "bold"))
+    btn_generate.pack(pady=10)
 
-# 4. User Input Fields
-frame_inputs = tk.LabelFrame(root, text="Your Calculations", padx=10, pady=10)
-frame_inputs.pack(pady=15)
+    # 3. Display Problem Values
+    frame_values = tk.Frame(root)
+    frame_values.pack(pady=10)
+    label_support = tk.Label(frame_values, text="Support Condition: -", font=("Arial", 11))
+    label_support.pack()
+    label_span = tk.Label(frame_values, text="Span (ℓ): - mm", font=("Arial", 11))
+    label_span.pack()
+    label_fy = tk.Label(frame_values, text="Steel Yield (fy): - MPa", font=("Arial", 11))
+    label_fy.pack()
 
-tk.Label(frame_inputs, text="Base Minimum h (mm):").grid(row=0, column=0, pady=5, sticky="e")
-entry_base = tk.Entry(frame_inputs, width=15)
-entry_base.grid(row=0, column=1, pady=5, padx=5)
-tk.Label(frame_inputs, text="(Assume fy=420 MPa, Table 409)", font=("Arial", 8), fg="gray").grid(row=0, column=2, pady=5, sticky="w")
+    # 4. User Input Fields
+    frame_inputs = tk.LabelFrame(root, text="Your Calculations", padx=10, pady=10)
+    frame_inputs.pack(pady=15)
 
-tk.Label(frame_inputs, text="Modifier Factor:").grid(row=1, column=0, pady=5, sticky="e")
-entry_modifier = tk.Entry(frame_inputs, width=15)
-entry_modifier.grid(row=1, column=1, pady=5, padx=5)
-tk.Label(frame_inputs, text="(0.4 + fy/700)", font=("Arial", 8), fg="gray").grid(row=1, column=2, pady=5, sticky="w")
+    tk.Label(frame_inputs, text="Base Minimum h (mm):").grid(row=0, column=0, pady=5, sticky="e")
+    entry_base = tk.Entry(frame_inputs, width=15)
+    entry_base.grid(row=0, column=1, pady=5, padx=5)
+    tk.Label(frame_inputs, text="(Assume fy=420 MPa, Table 409)", font=("Arial", 8), fg="gray").grid(row=0, column=2, pady=5, sticky="w")
 
-tk.Label(frame_inputs, text="Final Minimum h (mm):").grid(row=2, column=0, pady=5, sticky="e")
-entry_final = tk.Entry(frame_inputs, width=15)
-entry_final.grid(row=2, column=1, pady=5, padx=5)
-tk.Label(frame_inputs, text="(Base h x Modifier)", font=("Arial", 8), fg="gray").grid(row=2, column=2, pady=5, sticky="w")
+    tk.Label(frame_inputs, text="Modifier Factor:").grid(row=1, column=0, pady=5, sticky="e")
+    entry_modifier = tk.Entry(frame_inputs, width=15)
+    entry_modifier.grid(row=1, column=1, pady=5, padx=5)
+    tk.Label(frame_inputs, text="(0.4 + fy/700)", font=("Arial", 8), fg="gray").grid(row=1, column=2, pady=5, sticky="w")
 
-# 5. Action Buttons
-frame_buttons = tk.Frame(root)
-frame_buttons.pack(pady=15)
+    tk.Label(frame_inputs, text="Final Minimum h (mm):").grid(row=2, column=0, pady=5, sticky="e")
+    entry_final = tk.Entry(frame_inputs, width=15)
+    entry_final.grid(row=2, column=1, pady=5, padx=5)
+    tk.Label(frame_inputs, text="(Base h x Modifier)", font=("Arial", 8), fg="gray").grid(row=2, column=2, pady=5, sticky="w")
 
-btn_check = tk.Button(frame_buttons, text="✅ Check My Answers", command=check_answer, bg="#b3d9ff", font=("Arial", 10, "bold"), width=15)
-btn_check.pack(side="left", padx=5)
+    # 5. Action Buttons
+    frame_buttons = tk.Frame(root)
+    frame_buttons.pack(pady=15)
 
-btn_hint = tk.Button(frame_buttons, text="💡 How to Solve", command=show_hint, bg="#fff3cd", font=("Arial", 10, "bold"), width=15)
-btn_hint.pack(side="left", padx=5)
+    btn_check = tk.Button(frame_buttons, text="✅ Check My Answers", command=check_answer, bg="#b3d9ff", font=("Arial", 10, "bold"), width=15)
+    btn_check.pack(side="left", padx=5)
 
-# 6. Results & Score
-frame_results = tk.Frame(root)
-frame_results.pack(pady=10)
+    btn_hint = tk.Button(frame_buttons, text="💡 How to Solve", command=show_hint, bg="#fff3cd", font=("Arial", 10, "bold"), width=15)
+    btn_hint.pack(side="left", padx=5)
 
-result_label = tk.Label(frame_results, text="", font=("Arial", 11, "bold"))
-result_label.pack()
+    # 6. Results & Score
+    frame_results = tk.Frame(root)
+    frame_results.pack(pady=10)
 
-detail_feedback = tk.Label(frame_results, text="", font=("Arial", 9), fg="gray")
-detail_feedback.pack(pady=2)
+    result_label = tk.Label(frame_results, text="", font=("Arial", 11, "bold"))
+    result_label.pack()
 
-score_label = tk.Label(root, text="Score: 0 / 0", font=("Arial", 10, "bold"))
-score_label.pack(side="bottom", pady=10)
+    detail_feedback = tk.Label(frame_results, text="", font=("Arial", 9), fg="gray")
+    detail_feedback.pack(pady=2)
 
-# Initialize a problem on launch
-generate_problem()
+    score_label = tk.Label(root, text="Score: 0 / 0", font=("Arial", 10, "bold"))
+    score_label.pack(side="bottom", pady=10)
 
-root.mainloop()
+    # Initialize a problem on launch
+    generate_problem()
+
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()

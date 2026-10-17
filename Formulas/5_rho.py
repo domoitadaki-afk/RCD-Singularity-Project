@@ -196,76 +196,83 @@ def update_score():
 # ==========================================
 # GUI SETUP
 # ==========================================
-root = tk.Tk()
-root.title("Reinforcement Ratios Practice")
-root.geometry("650x620")
-root.resizable(False, False)
 
-# Bind Enter key
-root.bind('<Return>', check_answers)
+def main():
+    global current_b, current_d, current_fc, current_fy, current_beta1, current_fs, is_As_given, current_As, current_region, c_rho_min, c_rho_act, c_rho_max, score_min, score_act, score_max, score_total, root, frame_props, label_b, label_d, label_fc, label_fy, label_beta1, label_fs, label_region, label_As, frame_in, entry_rho_min, entry_rho_act, entry_rho_max, frame_btns, btn_check, btn_hint, result_lbl, score_lbl
+    root = tk.Tk()
+    root.title("Reinforcement Ratios Practice")
+    root.geometry("650x620")
+    root.resizable(False, False)
 
-# 1. Header
-tk.Label(root, text="Reinforcement Ratios (ρₘᵢₙ, ρₐ꜀ₜ, ρₘₐₓ)", font=("Arial", 14, "bold")).pack(pady=10)
+    # Bind Enter key
+    root.bind('<Return>', check_answers)
 
-# 2. Generate Button
-tk.Button(root, text="🔄 Generate New Problem", command=generate_problem, bg="#ececec", font=("Arial", 10)).pack(pady=5)
+    # 1. Header
+    tk.Label(root, text="Reinforcement Ratios (ρₘᵢₙ, ρₐ꜀ₜ, ρₘₐₓ)", font=("Arial", 14, "bold")).pack(pady=10)
 
-# 3. Beam Properties Box
-frame_props = tk.LabelFrame(root, text="Beam Properties", padx=10, pady=10)
-frame_props.pack(pady=10)
+    # 2. Generate Button
+    tk.Button(root, text="🔄 Generate New Problem", command=generate_problem, bg="#ececec", font=("Arial", 10)).pack(pady=5)
 
-label_b = tk.Label(frame_props, text="Width (b) = - mm", font=("Arial", 10))
-label_b.pack()
-label_d = tk.Label(frame_props, text="Eff. Depth (d) = - mm", font=("Arial", 10))
-label_d.pack()
-label_fc = tk.Label(frame_props, text="Concrete (f'c) = - MPa", font=("Arial", 10))
-label_fc.pack()
-label_fy = tk.Label(frame_props, text="Steel (fy) = - MPa", font=("Arial", 10))
-label_fy.pack()
-label_beta1 = tk.Label(frame_props, text="Beta 1 (β₁) = -", font=("Arial", 10))
-label_beta1.pack()
-label_fs = tk.Label(frame_props, text="Steel Stress (fs) = - MPa", font=("Arial", 10))
-label_fs.pack()
-label_region = tk.Label(frame_props, text="Region = -", font=("Arial", 10, "bold"), fg="blue")
-label_region.pack()
-label_As = tk.Label(frame_props, text="Area of Steel (As) = -", font=("Arial", 10, "bold"))
-label_As.pack(pady=(5,0))
+    # 3. Beam Properties Box
+    frame_props = tk.LabelFrame(root, text="Beam Properties", padx=10, pady=10)
+    frame_props.pack(pady=10)
 
-# 4. User Input Fields
-frame_in = tk.LabelFrame(root, text="Your Answers (Type the decimal)", padx=10, pady=10)
-frame_in.pack(pady=15)
+    label_b = tk.Label(frame_props, text="Width (b) = - mm", font=("Arial", 10))
+    label_b.pack()
+    label_d = tk.Label(frame_props, text="Eff. Depth (d) = - mm", font=("Arial", 10))
+    label_d.pack()
+    label_fc = tk.Label(frame_props, text="Concrete (f'c) = - MPa", font=("Arial", 10))
+    label_fc.pack()
+    label_fy = tk.Label(frame_props, text="Steel (fy) = - MPa", font=("Arial", 10))
+    label_fy.pack()
+    label_beta1 = tk.Label(frame_props, text="Beta 1 (β₁) = -", font=("Arial", 10))
+    label_beta1.pack()
+    label_fs = tk.Label(frame_props, text="Steel Stress (fs) = - MPa", font=("Arial", 10))
+    label_fs.pack()
+    label_region = tk.Label(frame_props, text="Region = -", font=("Arial", 10, "bold"), fg="blue")
+    label_region.pack()
+    label_As = tk.Label(frame_props, text="Area of Steel (As) = -", font=("Arial", 10, "bold"))
+    label_As.pack(pady=(5,0))
 
-tk.Label(frame_in, text="Min Ratio (ρₘᵢₙ):").grid(row=0, column=0, pady=5, sticky="e")
-entry_rho_min = tk.Entry(frame_in, width=15)
-entry_rho_min.grid(row=0, column=1, pady=5, padx=5)
+    # 4. User Input Fields
+    frame_in = tk.LabelFrame(root, text="Your Answers (Type the decimal)", padx=10, pady=10)
+    frame_in.pack(pady=15)
 
-tk.Label(frame_in, text="Actual Ratio (ρₐ꜀ₜ):").grid(row=1, column=0, pady=5, sticky="e")
-entry_rho_act = tk.Entry(frame_in, width=15)
-entry_rho_act.grid(row=1, column=1, pady=5, padx=5)
+    tk.Label(frame_in, text="Min Ratio (ρₘᵢₙ):").grid(row=0, column=0, pady=5, sticky="e")
+    entry_rho_min = tk.Entry(frame_in, width=15)
+    entry_rho_min.grid(row=0, column=1, pady=5, padx=5)
 
-tk.Label(frame_in, text="Max Ratio (ρₘₐₓ):").grid(row=2, column=0, pady=5, sticky="e")
-entry_rho_max = tk.Entry(frame_in, width=15)
-entry_rho_max.grid(row=2, column=1, pady=5, padx=5)
+    tk.Label(frame_in, text="Actual Ratio (ρₐ꜀ₜ):").grid(row=1, column=0, pady=5, sticky="e")
+    entry_rho_act = tk.Entry(frame_in, width=15)
+    entry_rho_act.grid(row=1, column=1, pady=5, padx=5)
 
-# 5. Action Buttons
-frame_btns = tk.Frame(root)
-frame_btns.pack(pady=10)
+    tk.Label(frame_in, text="Max Ratio (ρₘₐₓ):").grid(row=2, column=0, pady=5, sticky="e")
+    entry_rho_max = tk.Entry(frame_in, width=15)
+    entry_rho_max.grid(row=2, column=1, pady=5, padx=5)
 
-btn_check = tk.Button(frame_btns, text="✅ Check My Answers", command=check_answers, bg="#b3d9ff", font=("Arial", 10))
-btn_check.pack(side="left", padx=5)
+    # 5. Action Buttons
+    frame_btns = tk.Frame(root)
+    frame_btns.pack(pady=10)
 
-btn_hint = tk.Button(frame_btns, text="💡 Show Hint", command=show_hint, bg="#fff3cd", font=("Arial", 10))
-btn_hint.pack(side="left", padx=5)
+    btn_check = tk.Button(frame_btns, text="✅ Check My Answers", command=check_answers, bg="#b3d9ff", font=("Arial", 10))
+    btn_check.pack(side="left", padx=5)
 
-# 6. Results and Score
-result_lbl = tk.Label(root, text="", font=("Arial", 10))
-result_lbl.pack(pady=5)
+    btn_hint = tk.Button(frame_btns, text="💡 Show Hint", command=show_hint, bg="#fff3cd", font=("Arial", 10))
+    btn_hint.pack(side="left", padx=5)
 
-score_lbl = tk.Label(root, text="Score: 0 / 0", font=("Arial", 10, "bold"))
-score_lbl.pack(pady=5)
+    # 6. Results and Score
+    result_lbl = tk.Label(root, text="", font=("Arial", 10))
+    result_lbl.pack(pady=5)
 
-# Initial Generation
-generate_problem()
+    score_lbl = tk.Label(root, text="Score: 0 / 0", font=("Arial", 10, "bold"))
+    score_lbl.pack(pady=5)
 
-# Run the main loop
-root.mainloop()
+    # Initial Generation
+    generate_problem()
+
+    # Run the main loop
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()

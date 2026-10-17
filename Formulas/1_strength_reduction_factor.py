@@ -97,67 +97,73 @@ def update_score():
     score_label.config(text=f"Class Score: {score_class_correct}/{score_total}  |  Phi Score: {score_phi_correct}/{score_total}")
 
 # --- GUI Setup ---
-root = tk.Tk()
-root.title("RC Beam Classification - Fill in the Blank")
-root.geometry("540x480") # Slightly wider to fit the hint button nicely
-root.resizable(False, False)
+def main():
+    global current_fy, current_fs, correct_answer, correct_phi, score_class_correct, score_phi_correct, score_total, root, btn_generate, frame_values, label_fy, label_fs, frame_inputs, entry_class, entry_phi, frame_buttons, btn_check, btn_hint, frame_results, result_label, answer_reveal_label, score_label
+    root = tk.Tk()
+    root.title("RC Beam Classification - Fill in the Blank")
+    root.geometry("540x480") # Slightly wider to fit the hint button nicely
+    root.resizable(False, False)
 
-# BINDING THE ENTER KEY TO THE CHECK FUNCTION
-root.bind('<Return>', lambda event: check_answer())
+    # BINDING THE ENTER KEY TO THE CHECK FUNCTION
+    root.bind('<Return>', lambda event, c=check_answer: c())
 
-# 1. Header
-tk.Label(root, text="Reinforced Concrete Beam Self-Quiz", font=("Arial", 14, "bold")).pack(pady=10)
+    # 1. Header
+    tk.Label(root, text="Reinforced Concrete Beam Self-Quiz", font=("Arial", 14, "bold")).pack(pady=10)
 
-# 2. Generate Button
-btn_generate = tk.Button(root, text="🔄 Generate New Problem", command=generate_problem, bg="#ececec", font=("Arial", 10, "bold"))
-btn_generate.pack(pady=10)
+    # 2. Generate Button
+    btn_generate = tk.Button(root, text="🔄 Generate New Problem", command=generate_problem, bg="#ececec", font=("Arial", 10, "bold"))
+    btn_generate.pack(pady=10)
 
-# 3. Display Values
-frame_values = tk.Frame(root)
-frame_values.pack(pady=10)
-label_fy = tk.Label(frame_values, text="fy = -", font=("Arial", 12))
-label_fy.pack()
-label_fs = tk.Label(frame_values, text="fs = -", font=("Arial", 12))
-label_fs.pack()
+    # 3. Display Values
+    frame_values = tk.Frame(root)
+    frame_values.pack(pady=10)
+    label_fy = tk.Label(frame_values, text="fy = -", font=("Arial", 12))
+    label_fy.pack()
+    label_fs = tk.Label(frame_values, text="fs = -", font=("Arial", 12))
+    label_fs.pack()
 
-# 4. User Input Fields
-frame_inputs = tk.LabelFrame(root, text="Your Answers", padx=10, pady=10)
-frame_inputs.pack(pady=15)
+    # 4. User Input Fields
+    frame_inputs = tk.LabelFrame(root, text="Your Answers", padx=10, pady=10)
+    frame_inputs.pack(pady=15)
 
-tk.Label(frame_inputs, text="Classification:").grid(row=0, column=0, pady=5, sticky="e")
-entry_class = tk.Entry(frame_inputs, width=25)
-entry_class.grid(row=0, column=1, pady=5, padx=5)
-tk.Label(frame_inputs, text="(Compression, Transition, or Tension)", font=("Arial", 8), fg="gray").grid(row=0, column=2, pady=5, sticky="w")
+    tk.Label(frame_inputs, text="Classification:").grid(row=0, column=0, pady=5, sticky="e")
+    entry_class = tk.Entry(frame_inputs, width=25)
+    entry_class.grid(row=0, column=1, pady=5, padx=5)
+    tk.Label(frame_inputs, text="(Compression, Transition, or Tension)", font=("Arial", 8), fg="gray").grid(row=0, column=2, pady=5, sticky="w")
 
-tk.Label(frame_inputs, text="Phi (φ):").grid(row=1, column=0, pady=5, sticky="e")
-entry_phi = tk.Entry(frame_inputs, width=25)
-entry_phi.grid(row=1, column=1, pady=5, padx=5)
-tk.Label(frame_inputs, text="(Type the decimal value)", font=("Arial", 8), fg="gray").grid(row=1, column=2, pady=5, sticky="w")
+    tk.Label(frame_inputs, text="Phi (φ):").grid(row=1, column=0, pady=5, sticky="e")
+    entry_phi = tk.Entry(frame_inputs, width=25)
+    entry_phi.grid(row=1, column=1, pady=5, padx=5)
+    tk.Label(frame_inputs, text="(Type the decimal value)", font=("Arial", 8), fg="gray").grid(row=1, column=2, pady=5, sticky="w")
 
-# 5. Action Buttons (Check & Hint)
-frame_buttons = tk.Frame(root)
-frame_buttons.pack(pady=10)
+    # 5. Action Buttons (Check & Hint)
+    frame_buttons = tk.Frame(root)
+    frame_buttons.pack(pady=10)
 
-btn_check = tk.Button(frame_buttons, text="✅ Show Answer / Check", command=check_answer, bg="#b3d9ff", font=("Arial", 10, "bold"))
-btn_check.pack(side="left", padx=5)
+    btn_check = tk.Button(frame_buttons, text="✅ Show Answer / Check", command=check_answer, bg="#b3d9ff", font=("Arial", 10, "bold"))
+    btn_check.pack(side="left", padx=5)
 
-btn_hint = tk.Button(frame_buttons, text="💡 Hint: Transition Eq", command=show_hint, bg="#fff3cd", font=("Arial", 10, "bold"))
-btn_hint.pack(side="left", padx=5)
+    btn_hint = tk.Button(frame_buttons, text="💡 Hint: Transition Eq", command=show_hint, bg="#fff3cd", font=("Arial", 10, "bold"))
+    btn_hint.pack(side="left", padx=5)
 
-# 6. Results & Score
-frame_results = tk.Frame(root)
-frame_results.pack(pady=10)
+    # 6. Results & Score
+    frame_results = tk.Frame(root)
+    frame_results.pack(pady=10)
 
-result_label = tk.Label(frame_results, text="", font=("Arial", 11))
-result_label.pack()
+    result_label = tk.Label(frame_results, text="", font=("Arial", 11))
+    result_label.pack()
 
-answer_reveal_label = tk.Label(frame_results, text="", font=("Arial", 11, "bold"))
-answer_reveal_label.pack()
+    answer_reveal_label = tk.Label(frame_results, text="", font=("Arial", 11, "bold"))
+    answer_reveal_label.pack()
 
-score_label = tk.Label(root, text="Class Score: 0 / 0  |  Phi Score: 0 / 0", font=("Arial", 10, "bold"))
-score_label.pack(side="bottom", pady=10)
+    score_label = tk.Label(root, text="Class Score: 0 / 0  |  Phi Score: 0 / 0", font=("Arial", 10, "bold"))
+    score_label.pack(side="bottom", pady=10)
 
-# Initialize a problem when the app starts
-generate_problem()
+    # Initialize a problem when the app starts
+    generate_problem()
 
-root.mainloop()
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()
