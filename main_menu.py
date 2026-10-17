@@ -21,7 +21,13 @@ from tkinter import font as tkfont
 # ------------------------------------------------------------------
 # CONFIGURATION
 # ------------------------------------------------------------------
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# When frozen with PyInstaller (--onefile), __file__ points inside the temp
+# extraction dir, so use the folder of the .exe instead. Sub-apps (.py files)
+# are expected to sit next to the executable.
+if getattr(sys, "frozen", False):
+    BASE_DIR = os.path.dirname(os.path.abspath(sys.executable))
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 TOPICS_DIR = os.path.join(BASE_DIR, "Topics")
 FORMULAS_DIR = os.path.join(BASE_DIR, "Formulas")
 
@@ -66,8 +72,21 @@ SUB       = "#9fb0c3"
 
 
 def launch_app(folder, filename):
-    """Run a reviewer app in its own process so the menu stays usable."""
-    path = os.path.join(folder, filename)
+    """Run a reviewer app in its own process so the menu stays usable.
+
+    When frozen with PyInstaller (--onefile), the matching per-app .exe is
+    launched instead of the .py script, making the whole package fully
+    self-contained (no Python needed on the target PC). Run build_all.bat
+    to produce every exe, then keep the folder structure together.
+    """
+    if getattr(sys, "frozen", False):
+        # Compiled build: call the app's own executable (same stem as the .py)
+        exe_name = os.path.splitext(filename)[0] + (".exe" if os.name == "nt" else "")
+        path = os.path.join(folder, exe_name)
+        cmd = [path]
+    else:
+        path = os.path.join(folder, filename)
+        cmd = [sys.executable, path]
     if not os.path.isfile(path):
         return False
     kwargs = {}
@@ -76,7 +95,7 @@ def launch_app(folder, filename):
     else:
         kwargs["start_new_session"] = True
     try:
-        subprocess.Popen([sys.executable, path], cwd=folder, **kwargs)
+        subprocess.Popen(cmd, cwd=folder, **kwargs)
         return True
     except OSError:
         return False
