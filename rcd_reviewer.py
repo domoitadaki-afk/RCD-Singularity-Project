@@ -33,28 +33,76 @@ from tkinter import font as tkfont
 import sys, os
 
 def _ensure_tkinter_submodules():
-    """PyInstaller only bundles tkinter submodules that are imported by the
-    frozen entry script. When bundled app sources are executed at runtime via
-    runpy, their `from tkinter import ttk/messagebox/...` imports would fail,
-    so pre-import (and register) them here."""
-    try:
-        import tkinter
-    except Exception:
-        return
+    """Make every tkinter submodule importable inside a PyInstaller --onefile
+    build — THE fix for "reviewers won't open from the built exe".
+
+    Root cause (verified against a real frozen build): PyInstaller extracts
+    the stdlib `tkinter` *sources* next to the bundled app sources, e.g.
+    _MEIPASS/tkinter/__init__.py alongside _MEIPASS/Topics/*.py. When an
+    embedded script does `from tkinter import ttk`, Python resolves the
+    `tkinter` package from that extracted folder, whose __path__ contains no
+    compiled submodules — ttk/messagebox/etc. live only in the bundle's
+    internal archive — so the import dies with
+    "cannot import name 'ttk' from 'tkinter'".
+
+    Fix: load each submodule directly from its source file with
+    SourceFileLoader (bypassing the broken package-path lookup), register it
+    in sys.modules under both `tkinter.X` and bare `X`, and attach it to the
+    tkinter module object so `from tkinter import X` attribute lookups hit it
+    without any finder being consulted at all.
+    """
+    import importlib
+    import importlib.machinery
+    import importlib.util
+    import tkinter  # noqa: F401  (ensures the package itself is loaded)
+    keep = []  # strong refs so nothing gets evicted from sys.modules
     for name in ("ttk", "messagebox", "filedialog", "simpledialog",
                  "colorchooser", "font", "scrolledtext", "commondialog",
-                 "constants", "dialog"):
+                 "constants", "dialog", "dnd"):
         full = "tkinter." + name
         if full in sys.modules:
-            continue
-        try:
-            mod = __import__(full, fromlist=[name])
-            sys.modules[full] = mod
-            setattr(sys.modules["tkinter"], name, mod)
-        except ImportError:
-            pass
+            mod = sys.modules[full]
+        else:
+            mod = None
+            # 1) normal import first (works in dev / non-frozen runs)
+            try:
+                mod = importlib.import_module(full)
+            except Exception:
+                mod = None
+            # 2) frozen fallback: exec the extracted .py file directly
+            if mod is None:
+                meipass = getattr(sys, "_MEIPASS", "")
+                candidates = [os.path.join(meipass, "tkinter", name + ".py")] if meipass else []
+                try:
+                    candidates.append(os.path.join(os.path.dirname(importlib.util.find_spec("tkinter").origin), name + ".py"))
+                except Exception:
+                    pass
+                for file in candidates:
+                    if os.path.isfile(file):
+                        try:
+                            loader = importlib.machinery.SourceFileLoader(full, file)
+                            spec = importlib.util.spec_from_loader(full, loader)
+                            mod = importlib.util.module_from_spec(spec)
+                            sys.modules[full] = mod
+                            loader.exec_module(mod)
+                        except Exception:
+                            sys.modules.pop(full, None)
+                            mod = None
+                        if mod is not None:
+                            break
+            if mod is None:
+                continue
+        sys.modules[full] = mod
+        sys.modules.setdefault(name, mod)      # bare-name safety net
+        setattr(tkinter, name, mod)            # makes `from tkinter import X` work
+        keep.append(mod)
+    return keep
 
-_ensure_tkinter_submodules()
+# Imported eagerly at startup AND again right before each embedded app runs
+# (run_app_inline), because in a frozen single-file build the reviewer apps'
+# `from tkinter import ttk, messagebox ...` lines otherwise fail with
+# "cannot import name 'ttk' from 'tkinter'".
+_TK_SUBMODULES = _ensure_tkinter_submodules()
 
 # ------------------------------------------------------------------
 # CONFIGURATION
@@ -140,9 +188,11 @@ def launch_app_in_process(rel_path):
     calls mainloop itself, so each reviewer gets its own window while
     the menu stays available.
     """
-    cmd = [sys.executable, "--run-app", rel_path]
-    if not getattr(sys, "frozen", False):
-        cmd.insert(1, os.path.abspath(__file__))
+    if getattr(sys, "frozen", False):
+        # Re-invoke THIS executable in child mode (fully self-contained).
+        cmd = [sys.executable, "--run-app", rel_path]
+    else:
+        cmd = [sys.executable, os.path.abspath(__file__), "--run-app", rel_path]
     kwargs = {}
     if sys.platform.startswith("win"):
         kwargs["creationflags"] = 0x08000000  # CREATE_NO_WINDOW
@@ -155,11 +205,28 @@ def launch_app_in_process(rel_path):
         return False
 
 
-def run_app_inline(rel_path):
-    """Execute an app's Tk mainloop inside this process (--run-app mode)."""
+def run_app_child():
+    """Child mode (--run-app <path>): execute ONE reviewer app in THIS fresh
+    interpreter and exit when its window closes.
+
+    A brand-new process is used deliberately: inside the long-lived menu
+    process, PyInstaller's frozen-importer state makes late runtime imports
+    of tkinter submodules unreliable. A freshly booted child that pre-loads
+    every tkinter submodule at startup (see _ensure_tkinter_submodules) runs
+    the app script with plain runpy — verified working in frozen builds.
+    """
+    try:
+        _idx = sys.argv.index("--run-app")
+        rel_path = sys.argv[_idx + 1]
+    except (ValueError, IndexError):
+        sys.exit("Usage: RCDReviewer --run-app <relative/app/path.py>")
     path = resolve_app_path(rel_path)
     if path is None:
         sys.exit(f"App not found in bundle: {rel_path}")
+    # Strip our own flag so the embedded app sees clean argv.
+    sys.argv = sys.argv[:_idx] + sys.argv[_idx + 2:]
+    # Belt & suspenders: ensure submodules are loaded right before exec.
+    _ensure_tkinter_submodules()
     runpy.run_path(path, run_name="__main__")
     sys.exit(0)
 
@@ -306,15 +373,7 @@ class MainMenu(tk.Tk):
 # ENTRY POINT
 # ------------------------------------------------------------------
 if "--run-app" in sys.argv:
-    # Child mode: this process was spawned by the menu to host one app.
-    try:
-        _idx = sys.argv.index("--run-app")
-        _target = sys.argv[_idx + 1]
-    except (ValueError, IndexError):
-        sys.exit("Usage: rcd_reviewer [--run-app <relative/app/path.py>]")
-    # Strip our own flag so the embedded app sees clean argv.
-    sys.argv = sys.argv[:_idx] + sys.argv[_idx + 2:]
-    run_app_inline(_target)
+    run_app_child()
 else:
     app = MainMenu()
     app.mainloop()
